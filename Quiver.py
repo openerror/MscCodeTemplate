@@ -57,6 +57,7 @@ for fname in flist:
 	datafile.close()
 	plt.ioff()
 	fig = plt.figure()
+	ax = fig.add_subplot(111, aspect = 'equal')
 	plt.quiver(X, Y, U, V,
 		   color = "Teal",
 		   scale = 20)
