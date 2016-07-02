@@ -18,7 +18,9 @@ try:
 			paramdict[name] = value
 except IndexError:
 	print("Opps - IndexError encountered. Are there blank lines below the parameters?\n")
+paramfile.close()
 
+nparticles = paramdict["nparticles"]
 quantum = paramdict["quantum"]
 scaling = paramdict["scaling"]
 L = paramdict["Lx"]
@@ -47,22 +49,29 @@ for fname in flist:
 	V = np.zeros(shape = Y.shape)
 
 	datafile = open("ParticleData/%s.dat" %fname, "r")
-	for line in datafile:
-		data = line.split()
+	for particle_id in np.arange(nparticles):
+		data = datafile.readline().split()
 		x = float(data[1])*scaling; y = float(data[2])*scaling; phi = float(data[-1])
-		x_int = int(round(x, 0)) - 1
-		y_int = int(round(y, 0)) - 1
-		U[x_int, y_int] = np.cos(phi); V[x_int, y_int] = np.sin(phi)
+		x = int(np.round(x, 0)) - 1; y = int(np.round(y, 0)) - 1
+		
+		if particle_id in range(2):
+			U[x, y] = 1.5*np.cos(phi); V[x, y] = 1.5*np.sin(phi)
+		else:
+			U[x, y] = np.cos(phi); V[x, y] = np.sin(phi)
 	
-	datafile.close()
+	M = U**2 + V**2 #M for magnitude. This array will determine the quivers' colours
+	
+	''' ___ Code for plotting ___ '''
 	plt.ioff()
 	fig = plt.figure()
 	ax = fig.add_subplot(111, aspect = 'equal')
-	plt.quiver(X, Y, U, V,
-		   color = "Teal",
-		   scale = 20)
+	plt.quiver(X, Y, U, V, M,
+		   #color = "Teal", #for when quivers are of a single colour
+		   cmap = cm.seismic,
+		   scale = 15)
 	plt.title("Time step %i, t = %f" %(fname, n*quantum*dt))
 	#plt.show(plot1)
 	plt.savefig("QuiverData/%d.png" %n)
 	plt.close(fig)
+	
 	print("Quiver plot saved to %d.png" %n)
