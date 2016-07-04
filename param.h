@@ -6,4 +6,4 @@
 #define nparticles 1000
 #define number_step 3000000
 #define quantum 1000
-#define dt 0.001
+#define dt 0.0001

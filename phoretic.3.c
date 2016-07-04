@@ -27,18 +27,18 @@ double particle_x[nparticles]; // x position of particles
 double particle_y[nparticles]; // y position of particles 
 double particle_dir[nparticles]; // direction of particles, this is an angle
 
-double Dr=0.5; // rotational diffusion
-double v0=0.1; // 2.5 // //1.0 // 0.5 // particle velocity, constant and same for all
+double Dr=0.2; // rotational diffusion
+double v0=2.0; // 2.5 // //1.0 // 0.5 // particle velocity, constant and same for all
 double dx=1.0; // spatial step dx
 double dxs; // scaled spatial step dx
 
 double k0=0.0;// 3.0 // 5.0 // 0.5; //production rate // 0.02
-double kd=0.001; // 0.001 // 0.1 decay rate // 0.001
+double kd=0.01; // 0.001 // 0.1 decay rate // 0.001
 double Dc=0.1; // 0.1 // 1.0 diffusion coefficient  // 0.001
 
-double c_coup = 1.0; // -0.1 // -1.0 chemotactic coefficient: positive is chemoattractive
+double c_coup = -1.0; // -0.1 // -1.0 chemotactic coefficient: positive is chemoattractive
 
-double ka = 10.0; // 10.0 asymmetry in production
+double ka = 5.0; // 10.0 asymmetry in production
 double shift = -1.0; // -1.0 shift between centre and asymmetric production
 
 /*PDE variables*/
