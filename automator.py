@@ -17,11 +17,6 @@ if __name__ == "__main__":
 	os.chdir(target_dir)
 	#print(os.getcwd()) 
 	#os.system("cat %s" %executable_name)
-	begin = time.clock()
 	
 	for command in cmd_list:
 		subprocess32.call(command)
-		
-	end = time.clock()
-	time_taken = end - begin
-	print("\nThe simulation ran for %f" %time_taken)

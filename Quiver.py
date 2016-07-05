@@ -54,23 +54,37 @@ for fname in flist:
 		x = float(data[1])*scaling; y = float(data[2])*scaling; phi = float(data[-1])
 		x = int(np.round(x, 0)) - 1; y = int(np.round(y, 0)) - 1
 		
-		if particle_id in range(2):
-			U[x, y] = 1.5*np.cos(phi); V[x, y] = 1.5*np.sin(phi)
-		else:
+		# __ Altering the vector magnitudes to adjust the quivers' colors __ #
+		# By design, only the shortest and the longest vectors stand out in the plot (MORE ADJUSTMENT NEEDED)		
+		if particle_id == 0:								#Sacrifice one particle to set the scale right
+			U[x, y] = 0.707*np.cos(phi); V[x, y] = 0.707*np.sin(phi)
+		elif particle_id in np.arange(0, nparticles, 100):	#Tracer particles
+			U[x, y] = 0.6*np.cos(phi); V[x, y] = 0.6*np.sin(phi)
+		else:												#The rest
 			U[x, y] = np.cos(phi); V[x, y] = np.sin(phi)
 	
-	M = U**2 + V**2 #M for magnitude. This array will determine the quivers' colours
+	datafile.close()
+	M = U**2 + V**2 #M for magnitude. This array will determine the quivers' colours '''
 	
 	''' ___ Code for plotting ___ '''
 	plt.ioff()
 	fig = plt.figure()
 	ax = fig.add_subplot(111, aspect = 'equal')
-	plt.quiver(X, Y, U, V, M,
+	
+	# ___ Enlarge the plot beyond default size; useful for nparticle > O(10^2) ___ #
+	DefaultDPI = fig.get_dpi();fig.set_dpi(DefaultDPI*1.5)
+	DefaultInches = fig.get_size_inches(); fig.set_size_inches(DefaultInches[0]*1.5, DefaultInches[1]*1.5)
+	
+	plt.quiver(X, Y, U, V, 
+		   M, cmap = cm.seismic,
 		   #color = "Teal", #for when quivers are of a single colour
-		   cmap = cm.seismic,
+		   units = "width", 
+		   width = 0.001,
+		   headwidth = 15, headlength = 15, 
 		   scale = 15)
+	
+	plt.colorbar()
 	plt.title("Time step %i, t = %f" %(fname, n*quantum*dt))
-	#plt.show(plot1)
 	plt.savefig("QuiverData/%d.png" %n)
 	plt.close(fig)
 	
