@@ -52,7 +52,7 @@ def fieldtopng(datarootdir = "FieldData"):
 	dt = paramdict["dt"]
 	latticearea = Lsx*Lsy
 	
-	cfield = np.zeros(shape = (Lsx, Lsy))
+	cfield = np.zeros(shape = (Lsy, Lsx))
 	listofdats = os.listdir(datarootdir) #pre-assign to save time
 	
 	# --- Assumption: datarootdir only contains .dat files --- #
@@ -75,8 +75,8 @@ def fieldtopng(datarootdir = "FieldData"):
 		 for k in np.arange(latticearea):
 			 data = stepdata.readline().split()
 			 if len(data) != 0:
-				x = int(data[1]); y = int(data[0])
-				cfield[x, y] = float(data[-1])
+				x = int(data[0]); y = int(data[1])
+				cfield[y, x] = float(data[-1])
 		 stepdata.close()	 
 		 cfield = np.flipud(cfield) #Reversing the y axis, necessary for cfield.mp4 and particles.mp4 to match
 		 
