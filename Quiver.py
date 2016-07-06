@@ -23,9 +23,11 @@ paramfile.close()
 nparticles = paramdict["nparticles"]
 quantum = paramdict["quantum"]
 scaling = paramdict["scaling"]
-L = paramdict["Lx"]
+Lx = paramdict["Lx"]
+Ly = paramdict["Ly"]
 dt = paramdict["dt"]
-lattice_pts = complex(L * scaling)
+lattice_pts_x = complex(Lx * scaling)
+lattice_pts_y = complex(Ly * scaling)
 
 #___ Create a sorted list of input file names, sans the extension (.dat) ___#
 flist = []
@@ -44,10 +46,10 @@ else:
 n = 0 #Integer value to be used for naming the PNGs
 for fname in flist:
 	n += 1
-	X, Y = np.mgrid[0:L:lattice_pts, 0:L:lattice_pts]
+	X, Y = np.mgrid[0:Lx:lattice_pts_x, 0:Ly:lattice_pts_y]
 	U = np.zeros(shape = X.shape)
 	V = np.zeros(shape = Y.shape)
-
+	
 	datafile = open("ParticleData/%s.dat" %fname, "r")
 	for particle_id in np.arange(nparticles):
 		data = datafile.readline().split()
@@ -69,7 +71,7 @@ for fname in flist:
 	''' ___ Code for plotting ___ '''
 	plt.ioff()
 	fig = plt.figure()
-	ax = fig.add_subplot(111, aspect = 'equal')
+	#ax = fig.add_subplot(111, aspect = 'equal')
 	
 	# ___ Enlarge the plot beyond default size; useful for nparticle > O(10^2) ___ #
 	DefaultDPI = fig.get_dpi();fig.set_dpi(DefaultDPI*1.5)
@@ -83,7 +85,7 @@ for fname in flist:
 		   headwidth = 15, headlength = 15, 
 		   scale = 15)
 	
-	plt.colorbar()
+	#plt.colorbar()
 	plt.title("Time step %i, t = %f" %(fname, n*quantum*dt))
 	plt.savefig("QuiverData/%d.png" %n)
 	plt.close(fig)
