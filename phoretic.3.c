@@ -214,6 +214,10 @@ void reactiondiffusion(void)
 
       //update chemical concentration field here
       c_new[i][j]=c_new[i][j]+dt*Dc*(d2cdxdx+d2cdydy)-dt*kd*c[i][j];
+      
+      // Large Dc can lead to -ve concentrations; must fix, or else eventually SEGV due to runaway large numbers
+      if (c_new[i][j] < 0.0)
+		c_new[i][j] = 0.0;
     }
   }
   
