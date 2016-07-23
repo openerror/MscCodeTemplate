@@ -57,13 +57,14 @@ for fname in flist:
 		x = int(np.round(x, 0)) - 1; y = int(np.round(y, 0)) - 1
 		
 		# __ Altering the vector magnitudes to adjust the quivers' colors __ #
-		# By design, only the shortest and the longest vectors stand out in the plot (MORE ADJUSTMENT NEEDED)		
+		# By design, only the shortest and the longest vectors stand out in the plot (MORE ADJUSTMENT NEEDED)
+				
 		if particle_id == 0:								#Sacrifice one particle to set the scale right
-			U[x, y] = 0.707*np.cos(phi); V[x, y] = 0.707*np.sin(phi)
+			U[x, y] = 0.595*np.cos(phi); V[x, y] = 0.595*np.sin(phi)
 		elif particle_id in np.arange(0, nparticles, 100):	#Tracer particles
-			U[x, y] = 0.6*np.cos(phi); V[x, y] = 0.6*np.sin(phi)
-		else:												#The rest
 			U[x, y] = np.cos(phi); V[x, y] = np.sin(phi)
+		else:												#The rest
+			U[x, y] = 0.2*np.cos(phi); V[x, y] = 0.2*np.sin(phi)
 	
 	datafile.close()
 	M = U**2 + V**2 #M for magnitude. This array will determine the quivers' colours '''
