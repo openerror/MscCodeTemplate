@@ -70,42 +70,23 @@ int main(int argc, char *argv[])
     int start; 
     srand48(1231);
     
-    if (argc >= 2){
-        if (argc > 2)
-            printf("\nAll options after the first one will be ignored.");
-            
-        switch(argv[1][0]){
-            case 'r':
-            case 'R':
-                printf("\nWill attempt to resume execution");
-                start = particle_resume_init();
-                cfield_resume_init();
-                break;
-                
-            default:
-                printf("\nInvalid options. Will do nothing.\n");
-        }
+   
+    //initialize colloidal positions
+    for(n=0;n<nparticles;n++){
+        phase= 2.0*Pi*(0.5-drand48());
+        particle_dir[n] = phase;
+        particle_x[n] = ((double)(Lx))*drand48();
+        particle_y[n] = ((double)(Ly))*drand48();
     }
-    else{
-        start = 0;
-        printf("\nDefault action: start new simulation");
-        
-        //initialize colloidal positions
-        for(n=0;n<nparticles;n++){
-            phase= 2.0*Pi*(0.5-drand48());
-            particle_dir[n] = phase;
-            particle_x[n] = ((double)(Lx))*drand48();
-            particle_y[n] = ((double)(Ly))*drand48();
+    
+    // initialize chemical field
+    for (i=0;i<Lx;i++){
+        for (j=0;j<Ly;j++){
+            c[i][j]=0.1*drand48();
+            c_new[i][j]=c[i][j];
         }
-        
-        // initialize chemical field
-        for (i=0;i<Lx;i++){
-            for (j=0;j<Ly;j++){
-                c[i][j]=0.1*drand48();
-                c_new[i][j]=c[i][j];
-            }
-        }	
-    }
+    }	
+
 
 
   /*main for loop for dynamics is below*/
@@ -167,21 +148,23 @@ void streamfile(int step)
 {
   int i,j,n;
 
-  if((output = fopen("particles.dat","a"))==NULL)
+  char p_dat[81];
+  sprintf(p_dat, "ParticleData/%d.dat", step); 
+  if((output = fopen(p_dat, "w")) == NULL)
     {
       printf("I cannot open output file\n");
       exit(0);
     }
 
   for(n=0; n<nparticles; n++) {
-    
     fprintf(output, "%d %16.8f %16.8f %16.8f \n",
 	    step,particle_x[n],particle_y[n],particle_dir[n]);
   }
-  
   fclose(output);
 
-   if((output2 = fopen("cfield.dat","a"))==NULL)
+   char c_dat[81];
+   sprintf(c_dat, "FieldData/%d.dat", step); 
+   if((output2 = fopen(c_dat, "w"))==NULL)
     {
       printf("I cannot open output file\n");
       exit(0);
@@ -194,8 +177,6 @@ void streamfile(int step)
     }
   }
   fclose(output2);
-  
-
 }
 
 void reactiondiffusion(void)
@@ -253,59 +234,4 @@ void reactiondiffusion(void)
     }
   }
 
-}
-
-int particle_resume_init(){
-    FILE *p_dat;
-    int i = 0; // Dummy var in the for and while loops
-    int j = 0; // Offset parameter in fseek()
-    
-    int starting;  // Denote the starting time step --- larger than 0 if resuming execution
-    
-    p_dat = fopen("particles.dat", "r");
-    fseek(p_dat, 0L, 2);
-    
-    while (i < nparticles + 1){
-        /* Reading a file from its end, until the cursor has moved to 
-         the beginning of the rows representing the last time step */ 
-        ++j;
-        fseek(p_dat, -j, 2);
-        if (fgetc(p_dat) == '\n') ++i; 
-    }
-    
-    for (i = 0; i < nparticles; ++i){
-        fscanf(p_dat, "%d %lf %lf %lf", &starting, &particle_x[i], &particle_y[i], &particle_dir[i]);
-    }
-    
-    fclose(p_dat);
-    return starting;
-}
-
-void cfield_resume_init(){
-    FILE *c_dat;
-    int i = 0; // Dummy var in the for and while loops
-    int j = 0; // Offset parameter in fseek()
-    double lattice_area = Lsx * Lsy;
-    
-    int x, y; 
-    double cfield, cfield_new;
-    
-    c_dat = fopen("cfield.dat", "r");
-    fseek(c_dat, 0L, 2);
-    
-    while (i < lattice_area + 1){
-        /* Reading a file from its end, until the cursor has moved to 
-         the beginning of the rows representing the last time step */ 
-        ++j;
-        fseek(c_dat, -j, 2);
-        if (fgetc(c_dat) == '\n') ++i; 
-    }
-    
-    for (i = 0; i < lattice_area; ++i){
-        fscanf(c_dat, "%d %d %lf %lf", &x, &y, &cfield, &cfield_new);
-        c[x][y] = cfield;
-        c_new[x][y] = cfield_new;
-    }
-
-    fclose(c_dat);
 }
