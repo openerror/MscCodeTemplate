@@ -1,10 +1,10 @@
 ''' Format of data file: 4 columns of space-delimited numbers:
     step number, x, y, direction
     
-    The goal of this program is to generate one file (.dat) for every 
-    unique step number. The step number starts from 0, and increases by [quantum]
-    
-    Usage: python ParticleDataPrep.py [path to raw data file] 
+    The goal of this program is to read each *.dat file in [datafolder],
+    and plot it as a PNG image
+     
+    Usage: python ParticleDataPrep.py [datafolder]
     
     Note to self: for more on commandline arguments, http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html
 '''
@@ -25,32 +25,6 @@ for line in paramfile:
 	else:
 		value = int(line.split()[2])
 		paramdict[name] = value
-   
-def savesteps(rawdatafile, datarootdir = "ParticleData"):
-	''' 	
-    #1) loop over all step numbers present
-    #2) for each step number present, read nparticles line and write to file
-	'''
-	nparticles = paramdict["nparticles"]
-	number_step = paramdict['number_step']
-	quantum = paramdict['quantum']
-	
-	rawdata = open(rawdatafile, "r")
-    
-	if datarootdir not in os.listdir(os.getcwd()):
-		os.mkdir(datarootdir)
-	else:
-		rmtree(datarootdir)
-        
-	for j in range(0, number_step, quantum):
-		stepdata = open("%s/%i.dat" %(datarootdir,j), 'w')
-		for k in range(nparticles):
-			line = rawdata.readline()
-			stepdata.write(line)
-		stepdata.close()
-    
-	#Closing rawdata, just in case
-	rawdata.close()
     
 def steptopng(datarootdir): 
 	''' Visualises the .dat of a single timestep, output to PNG image '''
@@ -101,9 +75,8 @@ def steptopng(datarootdir):
 		 stepdata.close()
 
 if __name__ == "__main__":
-	datafolder = "ParticleData"
-	if os.path.isfile(sys.argv[1]):
-		savesteps(sys.argv[1], datarootdir = datafolder)
+	datafolder = sys.argv[1]
+	if os.path.exists(datafolder):
 		steptopng(datafolder)
 	else:
 		print("Invalid path to the raw data file")

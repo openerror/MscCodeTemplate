@@ -2,11 +2,10 @@ import os, sys, subprocess32, time
 
 cmd_list = [["make", "clean"],
 			["make", "dats"],
-			["python", "CfieldDataPrep.py", "cfield.dat"],
+			["python", "CfieldDataPrep.py", "FieldData"],
 			"ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./FieldData/pngmovie/%d.png  -vcodec libx264 -crf 25  -pix_fmt yuv420p ./cfield.mp4".split(),
-			["python", "ParticleDataPrep.py", "particles.dat"],
+			["python", "ParticleDataPrep.py", "ParticleData"],
 			"ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./ParticleData/pngmovie/%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p ./particle.mp4".split(),
-			["rm", "cfield.dat", "particles.dat"],
 			["python", "Quiver.py"],
 			"ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./QuiverData/%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p ./quiver.mp4".split()
 			]

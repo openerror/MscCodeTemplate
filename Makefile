@@ -1,15 +1,17 @@
-phoretic: phoretic.3.c param.h
+phoretic: phoretic.c param.h
 	gcc $< -lm -O3 -LNO -march=corei7-avx -o $@
 
 #Remove executable and data generated
 .PHONY: clean
 clean:
-	rm -rf FieldData ParticleData phoretic
-	rm *.dat
+	rm -rf FieldData ParticleData QuiverData
+	rm phoretic
+	rm cfield.mp4 particle.mp4 quiver.mp4
 
 #Run simulation and generate raw data
 .PHONY: dats
-dats : particles.dat cfield.dat
+dats : FieldData ParticleData
 
-%.dat: phoretic
+FieldData ParticleData: phoretic
+	mkdir FieldData ParticleData
 	./phoretic

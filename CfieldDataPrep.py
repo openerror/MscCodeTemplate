@@ -16,33 +16,6 @@ for line in paramfile:
 		value = int(line.split()[2])
 		paramdict[name] = value
 
-def savesteps(rawdatafile, datarootdir = "FieldData"):
-	''' 	
-    #1) loop over all step numbers present
-    #2) for each step number present, read latticearea line and write to file
-	'''
-	number_step = paramdict['number_step']
-	quantum = paramdict['quantum']
-	Lsx = paramdict['Lsx']
-	Lsy = paramdict["Lsy"]
-	latticearea = Lsx * Lsy
-	
-	rawdata = open(rawdatafile, "r")
-	if not os.path.exists(datarootdir):
-		os.mkdir(datarootdir)
-	else:
-		rmtree(datarootdir)
-		os.mkdir(datarootdir)
-    
-	for j in range(0, number_step, quantum):
-		stepdata = open("%s/%i.dat" %(datarootdir,j), 'w')
-		for k in range(latticearea):
-			line = rawdata.readline()
-			stepdata.write(line)
-		stepdata.close()
-    
-	#Closing rawdata, just in case
-	rawdata.close()
 
 def fieldtopng(datarootdir = "FieldData"):
 	number_step = paramdict['number_step']
@@ -92,7 +65,6 @@ def fieldtopng(datarootdir = "FieldData"):
 		 print("Snapshot of timestep %i written to PNG" %flist[j])
 		
 if __name__ == "__main__":
-	datafolder = "FieldData"
-	if os.path.isfile(sys.argv[1]):
-		savesteps(sys.argv[1], datarootdir = datafolder)
-	fieldtopng(datafolder)
+    datafolder = sys.argv[1]
+    if os.path.exists(datafolder):
+        fieldtopng(datafolder)
