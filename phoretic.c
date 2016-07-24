@@ -28,12 +28,12 @@ double particle_y[nparticles]; // y position of particles
 double particle_dir[nparticles]; // direction of particles, this is an angle
 
 double Dr=0.2; // rotational diffusion
-double v0=5.0; // 2.5 // //1.0 // 0.5 // particle velocity, constant and same for all
+double v0=2.0; // 2.5 // //1.0 // 0.5 // particle velocity, constant and same for all
 double dx=1.0; // spatial step dx
 double dxs; // scaled spatial step dx
 
 double k0=0.0;// 3.0 // 5.0 // 0.5; //production rate // 0.02
-double kd=1.0; // 0.001 // 0.1 decay rate // 0.001
+double kd=0.01; // 0.001 // 0.1 decay rate // 0.001
 double Dc=0.1; // 0.1 // 1.0 diffusion coefficient  // 0.001
 
 double c_coup = -1.0; // -0.1 // -1.0 chemotactic coefficient: positive is chemoattractive
@@ -56,15 +56,17 @@ void reactiondiffusion(void); // this solves reaction-diffusion
 
 void streamfile(int step);
 
-int main(int argc, char** argv)
+int main(int argc, char *argv[])
 {
   int i,j,k,n,disx,disy,disxup,disxdwn,disyup,disydwn;
   double phase,browniannoise,forcing;
-
   dxs=dx/(double)(scaling);
+  
+  int particle_resume_init(void);
+  void cfield_resume_init(void);
 
   /* Initialize particles and field with switch tree. 
-   * Either resume from existing particles.dat and cfield.dat, or start anew */
+   * Either resume from existing dats, or start anew */
     int start; 
     srand48(1231);
     
@@ -104,14 +106,15 @@ int main(int argc, char** argv)
             }
         }	
     }
-  
-  /*main for loop for dynamics is below*/
 
-  for(i = 0; i < number_step; i++){ 
+
+  /*main for loop for dynamics is below*/
+  for(i = start; i < number_step; i++){ 
 
     /*move particles */
 
     for(n = 0; n < nparticles; n++){
+		
 	  /* Remember: scaling > 1, and round() returns an integer. 
 	   * So disx and disy are the chemical field lattice coordinates closest to the particle */
       disx = round(particle_x[n]*scaling); //-1 because c counts array positions from 0 to Lx-1
@@ -164,23 +167,21 @@ void streamfile(int step)
 {
   int i,j,n;
 
-  char p_dat[81];
-  sprintf(p_dat, "ParticleData/%d.dat", step); 
-  if((output = fopen(p_dat, "w")) == NULL)
+  if((output = fopen("particles.dat","a"))==NULL)
     {
       printf("I cannot open output file\n");
       exit(0);
     }
 
   for(n=0; n<nparticles; n++) {
+    
     fprintf(output, "%d %16.8f %16.8f %16.8f \n",
 	    step,particle_x[n],particle_y[n],particle_dir[n]);
   }
+  
   fclose(output);
 
-   char c_dat[81];
-   sprintf(c_dat, "FieldData/%d.dat", step); 
-   if((output2 = fopen(c_dat, "w"))==NULL)
+   if((output2 = fopen("cfield.dat","a"))==NULL)
     {
       printf("I cannot open output file\n");
       exit(0);
@@ -238,6 +239,10 @@ void reactiondiffusion(void)
 
       //update chemical concentration field here
       c_new[i][j]=c_new[i][j]+dt*Dc*(d2cdxdx+d2cdydy)-dt*kd*c[i][j];
+      
+      // Large Dc can lead to -ve concentrations; must fix, or else eventually SEGV due to runaway large numbers
+      if (c_new[i][j] < 0.0)
+		c_new[i][j] = 0.0;
     }
   }
   
@@ -248,4 +253,59 @@ void reactiondiffusion(void)
     }
   }
 
+}
+
+int particle_resume_init(){
+    FILE *p_dat;
+    int i = 0; // Dummy var in the for and while loops
+    int j = 0; // Offset parameter in fseek()
+    
+    int starting;  // Denote the starting time step --- larger than 0 if resuming execution
+    
+    p_dat = fopen("particles.dat", "r");
+    fseek(p_dat, 0L, 2);
+    
+    while (i < nparticles + 1){
+        /* Reading a file from its end, until the cursor has moved to 
+         the beginning of the rows representing the last time step */ 
+        ++j;
+        fseek(p_dat, -j, 2);
+        if (fgetc(p_dat) == '\n') ++i; 
+    }
+    
+    for (i = 0; i < nparticles; ++i){
+        fscanf(p_dat, "%d %lf %lf %lf", &starting, &particle_x[i], &particle_y[i], &particle_dir[i]);
+    }
+    
+    fclose(p_dat);
+    return starting;
+}
+
+void cfield_resume_init(){
+    FILE *c_dat;
+    int i = 0; // Dummy var in the for and while loops
+    int j = 0; // Offset parameter in fseek()
+    double lattice_area = Lsx * Lsy;
+    
+    int x, y; 
+    double cfield, cfield_new;
+    
+    c_dat = fopen("cfield.dat", "r");
+    fseek(c_dat, 0L, 2);
+    
+    while (i < lattice_area + 1){
+        /* Reading a file from its end, until the cursor has moved to 
+         the beginning of the rows representing the last time step */ 
+        ++j;
+        fseek(c_dat, -j, 2);
+        if (fgetc(c_dat) == '\n') ++i; 
+    }
+    
+    for (i = 0; i < lattice_area; ++i){
+        fscanf(c_dat, "%d %d %lf %lf", &x, &y, &cfield, &cfield_new);
+        c[x][y] = cfield;
+        c_new[x][y] = cfield_new;
+    }
+
+    fclose(c_dat);
 }
