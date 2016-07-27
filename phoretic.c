@@ -27,19 +27,20 @@ double particle_x[nparticles]; // x position of particles
 double particle_y[nparticles]; // y position of particles 
 double particle_dir[nparticles]; // direction of particles, this is an angle
 
-double Dr=0.2; // rotational diffusion
+double Dxy=0.8; // translational diffusion of colloid
+double Dr=0.2; // rotational diffusion of colloid
 double v0=2.0; // 2.5 // //1.0 // 0.5 // particle velocity, constant and same for all
 double dx=1.0; // spatial step dx
 double dxs; // scaled spatial step dx
 
 double k0=0.0;// 3.0 // 5.0 // 0.5; //production rate // 0.02
-double kd=0.01; // 0.001 // 0.1 decay rate // 0.001
-double Dc=0.1; // 0.1 // 1.0 diffusion coefficient  // 0.001
+double kd=0.05; // 0.001 // 0.1 decay rate // 0.001
+double Dc=0.3; // 0.1 // 1.0 diffusion coefficient  // 0.001
 
 double c_coup = -1.0; // -0.1 // -1.0 chemotactic coefficient: positive is chemoattractive
 
 double ka = 5.0; // 10.0 asymmetry in production
-double shift = -1.0; // -1.0 shift between centre and asymmetric production
+double shift = -0.6; // -1.0 shift between centre and asymmetric production
 
 /*PDE variables*/
 
@@ -59,7 +60,7 @@ void streamfile(int step);
 int main(int argc, char *argv[])
 {
   int i,j,k,n,disx,disy,disxup,disxdwn,disyup,disydwn;
-  double phase,browniannoise,forcing;
+  double phase,phase_browniannoise,phase_forcing;
   dxs=dx/(double)(scaling);
   
   int particle_resume_init(void);
@@ -115,11 +116,13 @@ int main(int argc, char *argv[])
       double dxc=(c[disxup][disy]-c[disxdwn][disy])/(2.0*dxs);
       double dyc=(c[disx][disyup]-c[disx][disydwn])/(2.0*dxs);
       
-      browniannoise=sqrt(2.0*Dr*dt)*sqrt(3.0)*(1.0-2.0*drand48());
-      forcing = browniannoise+dt*c_coup*(cos(particle_dir[n])*dyc - sin(particle_dir[n])*dxc);
-      particle_dir[n] += forcing;
-      particle_x[n] += v0*cos(particle_dir[n])*dt;
-      particle_y[n] += v0*sin(particle_dir[n])*dt;
+      phase_browniannoise = sqrt(2.0*Dr*dt)*sqrt(3.0)*(1.0-2.0*drand48());
+      phase_forcing = phase_browniannoise + dt*c_coup*(cos(particle_dir[n])*dyc - sin(particle_dir[n])*dxc);
+      particle_dir[n] += phase_forcing;
+      
+      // constant speed translation + Brownian fluctuation
+      particle_x[n] += v0*cos(particle_dir[n])*dt + sqrt(2.0*Dxy*dt)*sqrt(3.0)*(1.0-2.0*drand48());
+      particle_y[n] += v0*sin(particle_dir[n])*dt + sqrt(2.0*Dxy*dt)*sqrt(3.0)*(1.0-2.0*drand48());
       
       /*take care of periodic boundary conditions now */
       if(particle_x[n]>Lx) particle_x[n] -= Lx;
