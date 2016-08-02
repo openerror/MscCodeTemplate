@@ -1,4 +1,9 @@
-import os, sys, subprocess32, time
+import os, sys, time
+
+if os.name == 'posix' and sys.version_info[0] < 3:
+    import subprocess32 as subprocess
+else:
+    import subprocess
 
 cmd_list = [["make", "clean"],
 			["make", "dats"],
