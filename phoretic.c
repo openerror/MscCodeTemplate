@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
   /* Initialize particles and field with switch tree. 
    * Either resume from existing dats, or start anew */
-    int start; 
+    int start = 0; 
     srand48(1231);
     
    
@@ -88,7 +88,26 @@ int main(int argc, char *argv[])
         }
     }	
 
-
+    // In case we have to resume from a specificed *.dat file
+    /*
+    FILE * particle_intfile;
+    FILE * cfield_intfile;
+    
+    particle_intfile = fopen("ParticleData/995000.dat", "r");
+    for (n = 0; n < nparticles; n++){
+        fscanf(particle_intfile, "%d %lf %lf %lf", &start, &particle_x[n], &particle_y[n], &particle_dir[n]);
+    }
+    fclose(particle_intfile);
+    
+    
+    cfield_intfile = fopen("FieldData/995000.dat", "r");
+    double conc, conc_new;
+    while (fscanf(cfield_intfile, "%d %d %lf %lf", &i, &j, &conc, &conc_new) != EOF){
+        c[i][j] = conc;
+        c_new[i][j] = conc_new;
+    }
+    fclose(cfield_intfile);
+    * /
 
   /*main for loop for dynamics is below*/
   for(i = start; i < number_step; i++){ 
