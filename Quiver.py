@@ -71,20 +71,20 @@ for fname in flist:
 	
 	''' ___ Code for plotting ___ '''
 	plt.ioff()
-	fig = plt.figure()
-	#ax = fig.add_subplot(111, aspect = 'equal')
+	fig = plt.figure(dpi = 80, figsize = (7.5, 10))
+	ax = fig.add_subplot(111, aspect = 'equal')
 	
 	# ___ Enlarge the plot beyond default size; useful for nparticle > O(10^2) ___ #
-	DefaultDPI = fig.get_dpi();fig.set_dpi(DefaultDPI*1.5)
+	DefaultDPI = fig.get_dpi(); fig.set_dpi(DefaultDPI*1.5)
 	DefaultInches = fig.get_size_inches(); fig.set_size_inches(DefaultInches[0]*1.5, DefaultInches[1]*1.5)
 	
 	plt.quiver(X, Y, U, V, 
 		   M, cmap = cm.seismic,
 		   #color = "Teal", #for when quivers are of a single colour
 		   units = "width", 
-		   width = 0.001,
+		   width = 0.002,
 		   headwidth = 15, headlength = 15, 
-		   scale = 15)
+		   scale = 7)
 	
 	#plt.colorbar()
 	plt.title("Time step %i, t = %f" %(fname, n*quantum*dt))

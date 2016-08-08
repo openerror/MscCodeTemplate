@@ -55,24 +55,27 @@ def steptopng(datarootdir):
 	
 	#variable j will be used to name the PNGs
 	for j in range(fnum):
-		 stepdata = open("%s/%i.dat" %(datarootdir,flist[j]), 'r')
-		 
-		 for k in range(nparticles):
-			 data = stepdata.readline().split()
-			 xpos[k] = data[1]
-			 ypos[k] = data[2]
+         stepdata = open("%s/%i.dat" %(datarootdir,flist[j]), 'r')
+         for k in range(nparticles):
+            data = stepdata.readline().split()
+            xpos[k] = data[1]
+            ypos[k] = data[2]
+         
+         plt.ioff()
+         fig = plt.figure()
+         DefaultInches = fig.get_size_inches(); fig.set_size_inches(DefaultInches[0]*1.5, DefaultInches[1]*1.5)
+         ax = fig.add_subplot(111, aspect = 'equal')
+         plt.axis([0, Lx, 0, Ly]); plt.title("Time step %i, t = %f" %(flist[j], j*quantum*dt))
+         plt.plot(xpos, ypos, 'r+')
+         plt.savefig('ParticleData/pngmovie/%i.png' %j)
+         
+         plt.close(fig)
+         print("Snapshot of timestep %i written to PNG" %flist[j])
+         stepdata.close()
 			 
 		 # --- Saving as PNG file --- #
 		 #First, turn off on-screen display of plots. See http://stackoverflow.com/questions/15713279/calling-pylab-savefig-without-display-in-ipython
-		 plt.ioff()
-		 fig = plt.figure()
-		 ax = fig.add_subplot(111, aspect = 'equal')
-		 plt.axis([0, Lx, 0, Ly]); plt.title("Time step %i, t = %f" %(flist[j], j*quantum*dt))
-		 plt.plot(xpos, ypos, 'r+')
-		 plt.savefig('ParticleData/pngmovie/%i.png' %j)
-		 plt.close(fig)
-		 print("Snapshot of timestep %i written to PNG" %flist[j])
-		 stepdata.close()
+         
 
 if __name__ == "__main__":
 	datafolder = sys.argv[1]
