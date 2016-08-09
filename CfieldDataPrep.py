@@ -58,7 +58,6 @@ def fieldtopng(datarootdir = "FieldData"):
 		 plt.ioff()
 		 
 		 fig = plt.figure()
-		 DefaultDPI = fig.get_dpi(); fig.set_dpi(DefaultDPI*1.5)
 		 plt.title("Time step %s, t = %f" %(j*quantum, dt*quantum*j))
 		 plt.imshow(cfield, cmap = cm.summer)
 		 plt.savefig('%s/pngmovie/%i.png' %(datarootdir, j))
