@@ -60,6 +60,8 @@ def fieldtopng(datarootdir = "FieldData"):
 		 fig = plt.figure()
 		 plt.title("Time step %s, t = %f" %(j*quantum, dt*quantum*j))
 		 plt.imshow(cfield, cmap = cm.summer)
+		 plt.colorbar()
+		 
 		 plt.savefig('%s/pngmovie/%i.png' %(datarootdir, j))
 		 plt.close(fig)
 		 print("Snapshot of timestep %i written to PNG" %flist[j])
