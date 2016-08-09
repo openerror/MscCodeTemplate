@@ -12,7 +12,7 @@ cmd_list = [["make", "clean"],
 			["python", "ParticleDataPrep.py", "ParticleData"],
 			"ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./ParticleData/pngmovie/%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p ./particle.mp4".split(),
 			["python", "Quiver.py"],
-			"ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./QuiverData/%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p ./quiver.mp4".split()
+			"ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./QuiverData/%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p ./quiver.mp4".split(), 
 			["python", "ImgCombine.py"],
             "ffmpeg -loglevel fatal -r 10 -f image2 -s 1024x768 -i ./CombinedPNGs/%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p ./combined.mp4".split()]
 
@@ -22,4 +22,4 @@ if __name__ == "__main__":
 	os.chdir(target_dir)
 	
 	for command in cmd_list:
-		subprocess32.call(command)
+		subprocess.call(command)
