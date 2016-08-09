@@ -22,4 +22,4 @@ if __name__ == "__main__":
 	os.chdir(target_dir)
 	
 	for command in cmd_list:
-		subprocess32.call(command)
+		subprocess.call(command)

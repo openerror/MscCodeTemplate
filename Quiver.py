@@ -51,13 +51,15 @@ for fname in flist:
 	V = np.zeros(shape = Y.shape)
 	
 	datafile = open("ParticleData/%s.dat" %fname, "r")
-	for particle_id in np.arange(nparticles):
+	N = np.arange(nparticles) #Pre-allocate for efficiency
+	
+	for particle_id in N:
 		data = datafile.readline().split()
 		x = float(data[1])*scaling; y = float(data[2])*scaling; phi = float(data[-1])
 		x = int(np.round(x, 0)) - 1; y = int(np.round(y, 0)) - 1
 		
 		# __ Altering the vector magnitudes to adjust the quivers' colors __ #
-		# By design, only the shortest and the longest vectors stand out in the plot (MORE ADJUSTMENT NEEDED)
+		# By design, only the shortest and the longest vectors stand out in the plot
 				
 		if particle_id == 0:								#Sacrifice one particle to set the scale right
 			U[x, y] = 0.595*np.cos(phi); V[x, y] = 0.595*np.sin(phi)
@@ -72,11 +74,11 @@ for fname in flist:
 	''' ___ Code for plotting ___ '''
 	plt.ioff()
 	fig = plt.figure()
-	#ax = fig.add_subplot(111, aspect = 'equal')
+	ax = fig.add_subplot(111, aspect = 'equal')
 	
 	# ___ Enlarge the plot beyond default size; useful for nparticle > O(10^2) ___ #
-	DefaultDPI = fig.get_dpi();fig.set_dpi(DefaultDPI*1.5)
-	DefaultInches = fig.get_size_inches(); fig.set_size_inches(DefaultInches[0]*1.5, DefaultInches[1]*1.5)
+	DefaultDPI = fig.get_dpi();fig.set_dpi(DefaultDPI*1.1)
+	DefaultInches = fig.get_size_inches(); fig.set_size_inches(DefaultInches[0]*1.1, DefaultInches[1]*1.1)
 	
 	plt.quiver(X, Y, U, V, 
 		   M, cmap = cm.seismic,
@@ -84,9 +86,11 @@ for fname in flist:
 		   units = "width", 
 		   width = 0.001,
 		   headwidth = 15, headlength = 15, 
-		   scale = 15)
+		   scale = 8)
 	
 	#plt.colorbar()
+	#plt.tick_params(axis='both', which='minor', labelsize=12)
+	plt.tick_params(axis='both', which='major', labelsize=12)
 	plt.title("Time step %i, t = %f" %(fname, n*quantum*dt))
 	plt.savefig("QuiverData/%d.png" %n)
 	plt.close(fig)
