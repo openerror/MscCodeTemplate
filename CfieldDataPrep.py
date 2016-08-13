@@ -26,20 +26,19 @@ def fieldtopng(datarootdir = "FieldData"):
 	latticearea = Lsx*Lsy
 	
 	cfield = np.zeros(shape = (Lsy, Lsx))
-	listofdats = os.listdir(datarootdir) #pre-assign to save time
 	
-	# --- Assumption: datarootdir only contains .dat files --- #
+	# ---  If folder "pngmovie" already exists, delete and recreate !! --- #
 	if os.path.exists("%s/pngmovie" %datarootdir):
-		rmtree("%s/pngmovie" %datarootdir) 	# !! if folder "pngmovie" already exists, delete and recreate !!
-		fnum = len(listofdats)	#amount of .dat files in datarootdir
-		flist = [int(item.split(".")[0]) for item in listofdats] #list of all .dat filenames, sans the extension
-		flist.sort()
-		os.mkdir("%s/pngmovie" %datarootdir)
+		rmtree("%s/pngmovie" %datarootdir)
+		listofdats = os.listdir(datarootdir)
 	else:
-		fnum = len(listofdats) 	
-		flist = [int(item.split(".")[0]) for item in listofdats]
-		flist.sort()
-		os.mkdir("%s/pngmovie" %datarootdir)
+		listofdats = os.listdir(datarootdir)
+	os.mkdir("%s/pngmovie" %datarootdir)
+		
+	# --- Generate list with data file names, sans the extension .dat
+	fnum = len(listofdats)	
+	flist = [int(item.split(".")[0]) for item in listofdats]
+	flist.sort()
 	
 	# --- Looping over all the .dat files in datarootdir --- #
 	for j in range(fnum):
